@@ -104,13 +104,26 @@ function handleDrop(e) {
 function createDraggableCourse(course, courseId) {
     const div = document.createElement('div');
     div.className = 'draggable-course';
+    
+    let backgroundColor;
+    if (course.probability > 75) {
+      backgroundColor = 'rgba(144, 238, 144, 0.3)'; // Light green
+    } else if (course.probability >= 50) {
+      backgroundColor = 'rgba(255, 255, 224, 0.3)'; // Light yellow
+    } else {
+      backgroundColor = 'rgba(255, 182, 193, 0.3)'; // Light red
+    }
+    
+    div.style.backgroundColor = backgroundColor;
     div.innerHTML = `
-        <div class="course-indicator ${courseId.includes('CMS120') ? 'core' : 'elective'}"></div>
-        <span>${course.name}</span>
-        <span class="probability">${course.probability}%</span>
+      <div class="course-content">
+        <span class="course-name">${course.name}</span>
+        <span class="probability-text">${course.probability}%</span>
+      </div>
     `;
+    
     return div;
-}
+  }
 
 // Semester Plan Functions
 function initializeSemesterPlan() {
