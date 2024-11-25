@@ -14,7 +14,10 @@ const semesterPlanData = [
     { crn: '93567', title: 'Human Computer Interaction - CMS354', credits: 4, time: '2:00 pm - 3:00 pm', professor: 'Dr. Jamie Ray' },
     { crn: '95661', title: 'Software engineering - CMS340', credits: 4, time: '6:00 pm - 7:00 pm', professor: 'Dr. Latushka' },
     { crn: '97881', title: 'Databases - CMS327', credits: 4, time: '1:00 pm - 3:00 pm', professor: 'Dr. Ilya M' },
-    { crn: '93241', title: 'Discrete Math - MAT140', credits: 4, time: '8:00 am - 9:00 am', professor: 'Dr. Summet' }
+    { crn: '93241', title: 'Discrete Math - MAT140', credits: 4, time: '8:00 am - 9:00 am', professor: 'Dr. Summet' },
+    { crn: '93245', title: 'Introduction to Computer Science - CMS120', credits: 4, time: '7:00 am - 7:50 am', professor: 'Dr. Myers' },
+    { crn: '93248', title: 'Object Oriented Programming - CMS270', credits: 4, time: '2:00 pm - 3:15 am', professor: 'Dr. Elva' },
+    { crn: '93248', title: 'Computer Architecture and Systems - CMS230', credits: 4, time: '3:30 pm - 4:45 am', professor: 'Dr. Myers' }
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -67,6 +70,7 @@ function initializePlannerFeatures() {
     document.getElementById('generatePlan').addEventListener('click', generatePlan);
     document.getElementById('copyPlan').addEventListener('click', copyPlan);
     document.getElementById('downloadPlan').addEventListener('click', downloadPlan);
+    document.getElementById('clearPlan').addEventListener('click', clearPlan);
 }
 
 // Drag and Drop Handlers
@@ -147,8 +151,31 @@ function createDraggableCourse(course, courseId) {
 function initializeSemesterPlan() {
     const tbody = document.getElementById('semesterPlanBody');
     tbody.innerHTML = ''; // Clear existing content
+}
+
+function generatePlan() {
+        // Get all courses from the drop zone
+        const dropZone = document.getElementById('dropZone');
+        const selectedCourses = Array.from(dropZone.children).map(courseElement => {
+            const courseName = courseElement.querySelector('.course-name').textContent;
+            // Find the matching course in semesterPlanData
+            return semesterPlanData.find(planCourse => planCourse.title === courseName);
+        }).filter(course => course !== undefined); // Remove any undefined entries
     
-    semesterPlanData.forEach(course => {
+        if (selectedCourses.length === 0) {
+            alert('Please add courses to your plan before generating.');
+            return;
+        }
+    
+        // Update the semester plan table with only the selected courses
+        updateSemesterPlan(selectedCourses);
+}
+
+function updateSemesterPlan(selectedCourses) {
+    const tbody = document.getElementById('semesterPlanBody');
+    tbody.innerHTML = ''; // Clear existing content
+    
+    selectedCourses.forEach(course => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${course.crn}</td>
@@ -159,14 +186,19 @@ function initializeSemesterPlan() {
         `;
         tbody.appendChild(row);
     });
-}
 
-function generatePlan() {
-    // Simulate plan generation
-    alert('Generating new semester plan...');
+    // Update the semesterPlanData to reflect only selected courses
+    // This ensures copyPlan and downloadPlan functions work with the current selection
+    window.semesterPlanData = selectedCourses;
 }
 
 function copyPlan() {
+    const tbody = document.getElementById('semesterPlanBody');
+    if (!tbody.children.length) {
+        alert('Please generate a plan first.');
+        return;
+    }
+
     const planText = semesterPlanData
         .map(course => `${course.crn}: ${course.title} - ${course.time}`)
         .join('\n');
@@ -177,6 +209,12 @@ function copyPlan() {
 }
 
 function downloadPlan() {
+    const tbody = document.getElementById('semesterPlanBody');
+    if (!tbody.children.length) {
+        alert('Please generate a plan first.');
+        return;
+    }
+
     const planText = semesterPlanData
         .map(course => `${course.crn},${course.title},${course.credits},${course.time},${course.professor}`)
         .join('\n');
@@ -188,6 +226,19 @@ function downloadPlan() {
     a.download = 'semester_plan.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+}
+
+function clearPlan() {
+    // Clear the semester plan table
+    const tbody = document.getElementById('semesterPlanBody');
+    tbody.innerHTML = '';
+    
+    // Reset the semesterPlanData to empty array
+    window.semesterPlanData = [];
+    
+    // Optionally clear the drop zone as well
+    const dropZone = document.getElementById('dropZone');
+    dropZone.innerHTML = '';
 }
 
 // Profile Features

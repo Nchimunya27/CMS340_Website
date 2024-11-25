@@ -246,3 +246,16 @@
     }
   }
   
+  #clearPlan {
+    background-color: #ff6b6b;  /* Light red background */
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#clearPlan:hover {
+    background-color: #ff5252;  /* Darker red on hover */
+}
