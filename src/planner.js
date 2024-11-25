@@ -96,6 +96,16 @@ function handleDrop(e) {
     const course = courseData[courseId];
     
     if (course) {
+        // Check if course already exists in drop zone
+        const existingCourse = Array.from(this.children).find(
+            child => child.querySelector('.course-name').textContent === course.name
+        );
+        
+        if (existingCourse) {
+            alert('This course is already in your plan!');
+            return;
+        }
+        
         const courseElement = createDraggableCourse(course, courseId);
         this.appendChild(courseElement);
     }
@@ -107,20 +117,28 @@ function createDraggableCourse(course, courseId) {
     
     let backgroundColor;
     if (course.probability > 75) {
-      backgroundColor = 'rgba(144, 238, 144, 0.3)'; // Light green
+        backgroundColor = 'rgba(144, 238, 144, 0.3)'; // Light green
     } else if (course.probability >= 50) {
-      backgroundColor = 'rgba(255, 255, 224, 0.3)'; // Light yellow
+        backgroundColor = 'rgba(255, 255, 224, 0.3)'; // Light yellow
     } else {
-      backgroundColor = 'rgba(255, 182, 193, 0.3)'; // Light red
+        backgroundColor = 'rgba(255, 182, 193, 0.3)'; // Light red
     }
     
     div.style.backgroundColor = backgroundColor;
-    div.innerHTML = `
-      <div class="course-content">
-        <span class="course-name">${course.name}</span>
-        <span class="probability-text">${course.probability}%</span>
-      </div>
-    `;
+    
+    // Use the HTML template structure
+    div.innerHTML = document.querySelector('#course-template').innerHTML;
+    
+    // Fill in the course data
+    div.querySelector('.course-name').textContent = course.name;
+    div.querySelector('.probability-text').textContent = `${course.probability}%`;
+
+    // Add click handler for the remove button
+    const removeButton = div.querySelector('.remove-course');
+    removeButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent event bubbling
+        div.remove();
+    });
     
     return div;
   }

@@ -30,7 +30,7 @@
   }
   
   .navbar img {
-    width: 150px;
+    width: 160px;
     height: 50px;
     object-fit: cover;
   }
@@ -126,6 +126,38 @@
     position: relative;
     overflow: hidden;
   }
+
+  /* Styles for draggable courses and remove button
+.draggable-course {
+  position: relative;
+} */
+
+.course-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 30px; /* Make room for the remove button */
+}
+
+.remove-course {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 50%;
+  line-height: 1;
+}
+
+.remove-course:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #333;
+}
   
   .draggable-course::before {
     content: '';
@@ -145,7 +177,8 @@
   
   .probability-text {
     font-weight: bold;
-    z-index: 1;
+    position: absolute;
+    right: 40px;
   }
   
   .semester-plan {
@@ -189,3 +222,4 @@
       padding: 1rem;
     }
   }
+  
