@@ -25,14 +25,14 @@ CREATE TABLE Course (
     professor VARCHAR(100),
     capacity INT NOT NULL,
     credit INT NOT NULL,
-    time VARCHAR(20), -- Time of the course (e.g., '10:00-10:50A')
-    days VARCHAR(10)  -- Days of the course (e.g., 'MWF')
+    time VARCHAR(20),
+    days VARCHAR(10)
 );
 
 -- Table for Enrollments
 CREATE TABLE Enrollment (
     EnrollmentID INT PRIMARY KEY AUTO_INCREMENT,
-    rNumber VARCHAR(10),  -- Match the type of rNumber in the Student table
+    rNumber VARCHAR(10),
     courseID INT,
     FOREIGN KEY (rNumber) REFERENCES Student(rNumber),
     FOREIGN KEY (courseID) REFERENCES Course(courseID)
@@ -43,6 +43,7 @@ CREATE TABLE PreRequisite (
     prereqID INT PRIMARY KEY AUTO_INCREMENT,
     prereqCourseID INT,
     requiredBy INT,
+    prereqCourseName VARCHAR(200),
     FOREIGN KEY (prereqCourseID) REFERENCES Course(courseID),
     FOREIGN KEY (requiredBy) REFERENCES Course(courseID)
 );
@@ -53,7 +54,6 @@ VALUES
 (13903, 'Intro to Computer Science', 'D Myers', 22, 4, '10:00-10:50A', 'MWF'),
 (13904, 'Intro to Computer Sci Lab', 'D Myers', 22, 2, '2:00-5:00P', 'W'),
 (13905, 'Prog & Software Development', 'S Tisha', 22, 4, '11:00-12:15P', 'TR'),
-(14450, 'Prog & Software Development', 'S Tisha', 18, 4, '1:00-2:15P', 'MW'),
 (15064, 'Topics: Programming with AI', 'D Myers', 22, 2, '12:00-12:50P', 'MWF'),
 (14869, 'Computer Org & Architecture', 'V Summet', 22, 4, '1:00-2:15P', 'MW'),
 (14451, 'Data Structures and Algorithms', 'S Tisha', 22, 4, '2:00-3:15P', 'TR'),
@@ -65,7 +65,6 @@ VALUES
 (13907, 'Computer Science Capstone', 'R Elva', 22, 4, '3:30-4:45P', 'TR');
 
 -- Populate the PreRequisite table
-DELETE FROM PreRequisite;
 INSERT INTO PreRequisite (prereqCourseID, requiredBy)
 VALUES
     (13904, 13903),
@@ -82,15 +81,45 @@ VALUES
     (14869, 14872),
     (14451, 14872);
 
--- Verify tables
-SELECT * FROM Course;
-SELECT * FROM PreRequisite;
+-- Update prereqCourseName
+UPDATE PreRequisite
+SET prereqCourseName = (
+    SELECT title
+    FROM Course
+    WHERE Course.courseID = PreRequisite.prereqCourseID
+);
+
+-- Create a view for dynamic course names
+CREATE OR REPLACE VIEW PreRequisiteView AS
+SELECT 
+    p.prereqID,
+    p.prereqCourseID,
+    c1.title AS prereqCourseName,
+    p.requiredBy,
+    c2.title AS requiredByCourseName
+FROM PreRequisite p
+JOIN Course c1 ON p.prereqCourseID = c1.courseID
+JOIN Course c2 ON p.requiredBy = c2.courseID;
+
+-- Verify the view
+SELECT * FROM PreRequisiteView;
+
+SELECT 
+    p.prereqID,
+    p.prereqCourseID,
+    c1.title AS prereqCourseName,
+    p.requiredBy,
+    c2.title AS requiredByCourseName
+FROM PreRequisite p
+JOIN Course c1 ON p.prereqCourseID = c1.courseID
+JOIN Course c2 ON p.requiredBy = c2.courseID;
+
+-- Verify the view
+SELECT * FROM PreRequisiteView;
 INSERT INTO Student (rNumber, name, email, status, currentYear, courseTaken)
 VALUES
     ('R1001', 'Alice Freshman', 'alice.freshman@example.com', 'Active', 1, NULL),
     ('R1002', 'Bob Sophomore', 'bob.sophomore@example.com', 'Active', 2, NULL),
     ('R1003', 'Charlie Junior', 'charlie.junior@example.com', 'Active', 3, NULL),
     ('R1004', 'Dana Senior', 'dana.senior@example.com', 'Active', 4, NULL);
-
--- Verify the entries
 SELECT * FROM Student;
