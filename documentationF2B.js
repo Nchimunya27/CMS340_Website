@@ -2,7 +2,7 @@
 
     //Replace BASE_URL in the examples with your API's ngrok URL:
 
-    const BASE_URL = 'https://62cb-2603-9001-2af0-4c60-30e4-9954-ebdb-809.ngrok-free.app';
+    const BASE_URL = ' https://d855-2603-9001-2af0-4c60-5d41-1cf-df83-2a86.ngrok-free.app';
 
 //JavaScript Code Samples
 //1. Fetch All Students
