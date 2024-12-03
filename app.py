@@ -52,6 +52,8 @@ def delete_student(rNumber):
     connection.close()
     return jsonify({"message": "Student deleted successfully"})
 
+
+
 # ----------------- COURSE CRUD -----------------
 @app.route('/courses', methods=['GET'])
 def get_courses():

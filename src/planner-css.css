@@ -1,136 +1,136 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: system-ui, -apple-system, sans-serif;
-  }
-  
-  .navbar {
-    background-color: #0071BA;
-    color: white;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .home-icon, .profile-icon {
-    font-size: 20px;
-    color: white;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .logo-section {
-    text-align: center;
-    padding: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .navbar img {
-    width: 160px;
-    height: 50px;
-    object-fit: cover;
-  }
-  
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-  
-  .hidden {
-    display: none !important;
-  }
-  
-  .courses-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .course-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: white;
-    cursor: move;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .course-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  }
-  
-  .course-card.dragging {
-    opacity: 0.5;
-  }
-  
-  .course-indicator {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  
-  .core {
-    background-color: #FACF00;
-  }
-  
-  .elective {
-    background-color: #808080;
-  }
-  
-  .legend {
-    display: flex;
-    gap: 2rem;
-    margin: 1rem 0;
-  }
-  
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .drag-area {
-    min-height: 200px;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
-    padding: 1rem;
-    margin: 1rem 0;
-    background-color: #f8f9fa;
-    transition: border-color 0.3s;
-  }
-  
-  .drag-area.drag-over {
-    border-color: #0071BA;
-    background-color: #e8f0fe;
-  }
-  
-  .draggable-course {
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border-radius: 4px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    position: relative;
-    overflow: hidden;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, sans-serif;
+}
 
-  /* Styles for draggable courses and remove button
+.navbar {
+  background-color: #0071BA;
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-icon, .profile-icon {
+  font-size: 20px;
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-section {
+  text-align: center;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.navbar img {
+  width: 160px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.course-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: white;
+  cursor: move;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.course-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.course-card.dragging {
+  opacity: 0.5;
+}
+
+.course-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.core {
+  background-color: #FACF00;
+}
+
+.elective {
+  background-color: #808080;
+}
+
+.legend {
+  display: flex;
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.drag-area {
+  min-height: 200px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #f8f9fa;
+  transition: border-color 0.3s;
+}
+
+.drag-area.drag-over {
+  border-color: #0071BA;
+  background-color: #e8f0fe;
+}
+
+.draggable-course {
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+
 .draggable-course {
   position: relative;
-} */
+}
 
 .course-content {
   display: flex;

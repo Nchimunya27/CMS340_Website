@@ -1,11 +1,11 @@
 // Course data
 const courseData = {
-    'CMS120': { probability: 95, name: 'Introduction to Computer Science - CMS120' },
-    'CMS250': { probability: 68, name: 'Data Structures and Algorithms - CMS250' },
-    'CMS327': { probability: 75, name: 'Databases - CMS327' },
-    'CMS270': { probability: 82, name: 'Object Oriented Programming - CMS270' },
-    'CMS230': { probability: 77, name: 'Computer Architecture and Systems - CMS230' },
-    'MAT140': { probability: 88, name: 'Discrete Math - MAT140' }
+    'CMS120': { name: 'Introduction to Computer Science - CMS120', classSize: 30 },
+    'CMS250': { name: 'Data Structures and Algorithms - CMS250', classSize: 25 },
+    'CMS327': { name: 'Databases - CMS327', classSize: 20 },
+    'CMS270': { name: 'Object Oriented Programming - CMS270', classSize: 25 },
+    'CMS230': { name: 'Computer Architecture and Systems - CMS230', classSize: 30 },
+    'MAT140': { name: 'Discrete Math - MAT140', classSize: 35 }
 };
 
 // Sample semester plan data
@@ -38,11 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         plannerView.classList.add('hidden');
         profileView.classList.remove('hidden');
+        loadProfileInfo();
     });
 
     // Initialize planner functionality
     initializePlannerFeatures();
-    
+
     // Initialize profile functionality
     initializeProfileFeatures();
 });
@@ -94,58 +95,71 @@ function handleDragLeave(e) {
 
 function handleDrop(e) {
     e.preventDefault();
+    console.log('Drop event triggered');
     this.classList.remove('drag-over');
-    
     const courseId = e.dataTransfer.getData('text/plain');
     const course = courseData[courseId];
-    
     if (course) {
-        // Check if course already exists in drop zone
+        console.log('Course data:', course);
         const existingCourse = Array.from(this.children).find(
             child => child.querySelector('.course-name').textContent === course.name
         );
-        
         if (existingCourse) {
             alert('This course is already in your plan!');
             return;
         }
-        
-        const courseElement = createDraggableCourse(course, courseId);
+        const userInfo = getUserInfo();
+        const adjustedProbability = calculateProbability(userInfo, course);
+        const courseElement = createDraggableCourse(course, courseId, adjustedProbability);
         this.appendChild(courseElement);
+    } else {
+        console.log('Course not found in courseData');
     }
 }
 
-function createDraggableCourse(course, courseId) {
+function getUserInfo() {
+    const classYear = document.getElementById('classYear').value;
+    const specialProgram = document.getElementById('specialProgram').value;
+    const rNumber = document.getElementById('rNumber').value;
+    
+    // Get selected classes
+    const selectedClasses = Array.from(document.querySelectorAll('#classesTaken input[type="checkbox"]:checked'))
+        .map(checkbox => checkbox.value);
+
+    return {
+        year: classYear,
+        status: specialProgram,
+        rNumber: rNumber,
+        classesTaken: selectedClasses
+    };
+}
+
+function createDraggableCourse(course, courseId, adjustedProbability) {
     const div = document.createElement('div');
     div.className = 'draggable-course';
-    
     let backgroundColor;
-    if (course.probability > 75) {
+    if (adjustedProbability > 75) {
         backgroundColor = 'rgba(144, 238, 144, 0.3)'; // Light green
-    } else if (course.probability >= 50) {
+    } else if (adjustedProbability >= 50) {
         backgroundColor = 'rgba(255, 255, 224, 0.3)'; // Light yellow
     } else {
         backgroundColor = 'rgba(255, 182, 193, 0.3)'; // Light red
     }
-    
     div.style.backgroundColor = backgroundColor;
-    
-    // Use the HTML template structure
-    div.innerHTML = document.querySelector('#course-template').innerHTML;
-    
-    // Fill in the course data
-    div.querySelector('.course-name').textContent = course.name;
-    div.querySelector('.probability-text').textContent = `${course.probability}%`;
-
-    // Add click handler for the remove button
+    div.innerHTML = `
+        <div class="course-content">
+            <span class="course-name">${course.name}</span>
+            <span class="probability-text">${adjustedProbability}%</span>
+        </div>
+        <button class="remove-course">&times;</button>
+    `;
     const removeButton = div.querySelector('.remove-course');
     removeButton.addEventListener('click', function(e) {
-        e.stopPropagation(); // Prevent event bubbling
+        e.stopPropagation();
         div.remove();
     });
-    
     return div;
-  }
+}
 
 // Semester Plan Functions
 function initializeSemesterPlan() {
@@ -154,27 +168,26 @@ function initializeSemesterPlan() {
 }
 
 function generatePlan() {
-        // Get all courses from the drop zone
-        const dropZone = document.getElementById('dropZone');
-        const selectedCourses = Array.from(dropZone.children).map(courseElement => {
-            const courseName = courseElement.querySelector('.course-name').textContent;
-            // Find the matching course in semesterPlanData
-            return semesterPlanData.find(planCourse => planCourse.title === courseName);
-        }).filter(course => course !== undefined); // Remove any undefined entries
-    
-        if (selectedCourses.length === 0) {
-            alert('Please add courses to your plan before generating.');
-            return;
-        }
-    
-        // Update the semester plan table with only the selected courses
-        updateSemesterPlan(selectedCourses);
+    // Get all courses from the drop zone
+    const dropZone = document.getElementById('dropZone');
+    const selectedCourses = Array.from(dropZone.children).map(courseElement => {
+        const courseName = courseElement.querySelector('.course-name').textContent;
+        // Find the matching course in semesterPlanData
+        return semesterPlanData.find(planCourse => planCourse.title === courseName);
+    }).filter(course => course !== undefined); // Remove any undefined entries
+
+    if (selectedCourses.length === 0) {
+        alert('Please add courses to your plan before generating.');
+        return;
+    }
+
+    // Update the semester plan table with only the selected courses
+    updateSemesterPlan(selectedCourses);
 }
 
 function updateSemesterPlan(selectedCourses) {
     const tbody = document.getElementById('semesterPlanBody');
     tbody.innerHTML = ''; // Clear existing content
-    
     selectedCourses.forEach(course => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -186,149 +199,208 @@ function updateSemesterPlan(selectedCourses) {
         `;
         tbody.appendChild(row);
     });
-
-    // Update the semesterPlanData to reflect only selected courses
-    // This ensures copyPlan and downloadPlan functions work with the current selection
-    window.semesterPlanData = selectedCourses;
 }
 
 function copyPlan() {
-    const tbody = document.getElementById('semesterPlanBody');
-    if (!tbody.children.length) {
-        alert('Please generate a plan first.');
-        return;
-    }
-
-    const planText = semesterPlanData
-        .map(course => `${course.crn}: ${course.title} - ${course.time}`)
-        .join('\n');
-    
-    navigator.clipboard.writeText(planText)
-        .then(() => alert('Plan copied to clipboard!'))
-        .catch(err => console.error('Failed to copy plan:', err));
+    const planTable = document.getElementById('semesterPlanTable');
+    const range = document.createRange();
+    range.selectNode(planTable);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    alert('Semester plan copied to clipboard!');
 }
 
 function downloadPlan() {
-    const tbody = document.getElementById('semesterPlanBody');
-    if (!tbody.children.length) {
-        alert('Please generate a plan first.');
-        return;
-    }
-
-    const planText = semesterPlanData
-        .map(course => `${course.crn},${course.title},${course.credits},${course.time},${course.professor}`)
-        .join('\n');
-    
-    const blob = new Blob([planText], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
+    const planTable = document.getElementById('semesterPlanTable');
+    const html = planTable.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'semester_plan.csv';
+    a.href = URL.createObjectURL(blob);
+    a.download = 'semester_plan.html';
+    document.body.appendChild(a);
     a.click();
-    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
 }
 
 function clearPlan() {
-    // Clear the semester plan table
     const tbody = document.getElementById('semesterPlanBody');
     tbody.innerHTML = '';
-    
-    // Reset the semesterPlanData to empty array
-    window.semesterPlanData = [];
-    
-    // Optionally clear the drop zone as well
     const dropZone = document.getElementById('dropZone');
     dropZone.innerHTML = '';
 }
 
-// Profile Features
+// Profile functionality
 function initializeProfileFeatures() {
-    // Handle dropdown toggles
-    const dropdowns = document.querySelectorAll('.dropdown-toggle');
-    
-    dropdowns.forEach(dropdown => {
-        dropdown.addEventListener('click', (e) => {
-            e.preventDefault();
-            const menu = dropdown.nextElementSibling;
-            
-            // Close other dropdowns
-            document.querySelectorAll('.dropdown-menu').forEach(otherMenu => {
-                if (otherMenu !== menu) {
-                    otherMenu.classList.remove('show');
-                }
-            });
-            
-            menu.classList.toggle('show');
-        });
-    });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.dropdown-container')) {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.classList.remove('show');
-            });
-        }
-    });
-
-    // Handle profile form submission
-    const profileForm = document.querySelector('.profile-form');
-    if (profileForm) {
-        profileForm.addEventListener('submit', handleProfileSubmit);
-    }
-}
-
-function handleProfileSubmit(e) {
+  const finishButton = document.querySelector('.finish-button');
+  finishButton.addEventListener('click', (e) => {
     e.preventDefault();
-    
-    // Collect form data
-    const formData = {
-        firstName: document.getElementById('firstName').value,
-        lastName: document.getElementById('lastName').value,
-        rNumber: document.getElementById('rNumber').value,
-        classYear: document.getElementById('classYear').value,
-        currentSemester: document.getElementById('currentSemester').value,
-        specialPrograms: getCheckedItems('specialProgramMenu'),
-        classesTaken: getCheckedItems('classesMenu')
-    };
-
-    // Store the profile data (could be sent to a server in a real application)
-    localStorage.setItem('profileData', JSON.stringify(formData));
-    
-    // Show success message
-    alert('Profile updated successfully!');
-    
-    // Switch back to planner view
+    saveProfileInfo();
+    alert('Profile information saved successfully!');
     document.getElementById('plannerView').classList.remove('hidden');
     document.getElementById('profileView').classList.add('hidden');
+  });
+
+  // Add event listeners for dropdowns
+  const dropdowns = document.querySelectorAll('.dropdown-toggle');
+  dropdowns.forEach(dropdown => {
+    dropdown.addEventListener('click', toggleDropdown);
+  });
+
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', closeDropdowns);
+
+  // Update dropdown text on checkbox change
+  const checkboxes = document.querySelectorAll('.dropdown-menu input[type="checkbox"]');
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateDropdownText);
+  });
 }
 
-function getCheckedItems(menuId) {
-    const checkedItems = [];
-    const menu = document.getElementById(menuId);
-    if (menu) {
-        const checkboxes = menu.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                checkedItems.push(checkbox.nextElementSibling.textContent.trim());
-            }
+function toggleDropdown(e) {
+  e.stopPropagation();
+  const dropdownMenu = this.nextElementSibling;
+  dropdownMenu.classList.toggle('show');
+}
+
+function closeDropdowns(e) {
+  if (!e.target.closest('.dropdown-container')) {
+    const dropdowns = document.querySelectorAll('.dropdown-menu');
+    dropdowns.forEach(dropdown => {
+      dropdown.classList.remove('show');
+    });
+    updateAllDropdownTexts();
+  }
+}
+
+function updateDropdownText(e) {
+  const dropdown = e.target.closest('.dropdown-container');
+  const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+  const toggleText = dropdown.querySelector('.dropdown-toggle span');
+  
+  if (checkboxes.length === 0) {
+    toggleText.textContent = 'Select options';
+  } else if (checkboxes.length === 1) {
+    toggleText.textContent = checkboxes[0].nextElementSibling.textContent;
+  } else {
+    toggleText.textContent = `${checkboxes.length} selected`;
+  }
+}
+
+function updateAllDropdownTexts() {
+  const dropdowns = document.querySelectorAll('.dropdown-container');
+  dropdowns.forEach(dropdown => {
+    const checkboxes = dropdown.querySelectorAll('input[type="checkbox"]:checked');
+    const toggleText = dropdown.querySelector('.dropdown-toggle span');
+    
+    if (checkboxes.length === 0) {
+      toggleText.textContent = 'Select options';
+    } else if (checkboxes.length === 1) {
+      toggleText.textContent = checkboxes[0].nextElementSibling.textContent;
+    } else {
+      toggleText.textContent = `${checkboxes.length} selected`;
+    }
+  });
+}
+
+
+function saveProfileInfo() {
+    const rNumber = document.getElementById('rNumber').value;
+    const classYear = document.getElementById('classYear').value;
+    const specialPrograms = Array.from(document.querySelectorAll('#specialPrograms input[type="checkbox"]:checked')).map(cb => cb.value);
+    const classesTaken = Array.from(document.querySelectorAll('#classesTaken input[type="checkbox"]:checked')).map(cb => cb.value);
+    const currentSemester = document.getElementById('currentSemester').value;
+
+    const profileData = {
+        rNumber,
+        classYear,
+        specialPrograms,
+        classesTaken,
+        currentSemester
+    };
+
+    localStorage.setItem('profileData', JSON.stringify(profileData));
+}
+
+function loadProfileInfo() {
+    const profileData = JSON.parse(localStorage.getItem('profileData'));
+    if (profileData) {
+        document.getElementById('rNumber').value = profileData.rNumber || '';
+        document.getElementById('classYear').value = profileData.classYear || '';
+        
+        profileData.specialPrograms.forEach(program => {
+            const checkbox = document.querySelector(`#specialPrograms input[value="${program}"]`);
+            if (checkbox) checkbox.checked = true;
         });
-    }
-    return checkedItems;
-}
-
-// Load profile data on page load
-function loadProfileData() {
-    const savedData = localStorage.getItem('profileData');
-    if (savedData) {
-        const data = JSON.parse(savedData);
-        document.getElementById('firstName').value = data.firstName || '';
-        document.getElementById('lastName').value = data.lastName || '';
-        document.getElementById('rNumber').value = data.rNumber || '';
-        document.getElementById('classYear').value = data.classYear || '';
-        document.getElementById('currentSemester').value = data.currentSemester || '';
+        
+        profileData.classesTaken.forEach(course => {
+            const checkbox = document.querySelector(`#classesTaken input[value="${course}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+        
+        document.getElementById('currentSemester').value = profileData.currentSemester || '';
     }
 }
 
-// Call loadProfileData when the page loads
-document.addEventListener('DOMContentLoaded', loadProfileData);
+// Calculate Probability function
+function calculateProbability(person, course) {
+    let classYearStat = 0;
+    let statusStat = 0;
+    let courseCapStat = 0;
+ 
+    // Calculate class year probability
+    if (person.year === 'Senior') {
+        classYearStat = 50;
+    } else if (person.year === 'Junior') {
+        classYearStat = 40;
+    } else if (person.year === 'Sophomore') {
+        classYearStat = 30;
+    } else if (person.year === 'Freshman') {
+        classYearStat = 20;
+    }
+ 
+    // Calculate status probability (Honors/3-2/Athlete)
+    if (person.status === 'Honors Student' || person.status === '3/2 AMP Program' || person.status === 'Student Athlete') {
+        statusStat = 20;
+    }
+ 
+    // Calculate capacity probability
+    if (course.classSize < 18) {
+        if (person.year === 'Senior') {
+            courseCapStat = 10;
+        } else if (person.year === 'Junior') {
+            courseCapStat = 8;
+        } else if (person.year === 'Sophomore') {
+            courseCapStat = 6;
+        } else if (person.year === 'Freshman') {
+            courseCapStat = 4;
+        }
+    } else if (course.classSize < 30) {
+        if (person.year === 'Senior') {
+            courseCapStat = 15;
+        } else if (person.year === 'Junior') {
+            courseCapStat = 12;
+        } else if (person.year === 'Sophomore') {
+            courseCapStat = 9;
+        } else if (person.year === 'Freshman') {
+            courseCapStat = 6;
+        }
+    } else {
+        if (person.year === 'Senior') {
+            courseCapStat = 20;
+        } else if (person.year === 'Junior') {
+            courseCapStat = 15;
+        } else if (person.year === 'Sophomore') {
+            courseCapStat = 12;
+        } else if (person.year === 'Freshman') {
+            courseCapStat = 8;
+        }
+    }
+ 
+    // Calculate total probability
+    const totalProbability = classYearStat + statusStat + courseCapStat;
+   
+    // Ensure probability doesn't exceed 100%
+    return Math.floor(Math.random() * 100);
+}
