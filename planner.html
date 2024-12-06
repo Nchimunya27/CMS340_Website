@@ -8,7 +8,10 @@
 </head>
 <body>
     <nav class="navbar">
-        <a href="#" class="home-icon" id="homeButton">⌂ <img src="./src/Honors Thesis Update presentation.png" alt="Rollins"> </a>
+        <a href="#" class="home-icon" id="homeButton">
+            <span class="home-symbol">⌂</span>
+            <img src="./src/Honors Thesis Update presentation.png" alt="Rollins Logo">
+        </a>
         <a href="#" class="profile-icon" id="profileButton">My Profile 👤</a>
     </nav>
 
@@ -18,80 +21,60 @@
 
     <!-- Main Planner View -->
     <div class="container" id="plannerView">
-        <h2>Computer Science Courses available for next semester:</h2>
-        
-        <div class="courses-grid" id="availableCourses">
-            <div class="course-card" draggable="true" data-course-id="CMS120">
-                <div class="course-indicator core"></div>
-                <div>
-                    <div>Introduction to Computer Science - CMS120</div>
-                    <small>(no pre-req)</small>
-                </div>
+        <section class="available-courses">
+            <h2>Computer Science Courses Available for Next Semester</h2>
+            
+            <!-- Course Container for dynamically generated course cards -->
+            <div class="courses-grid" id="courseContainer">
+                <!-- Course cards will be generated here -->
             </div>
-            <div class="course-card" draggable="true" data-course-id="CMS250">
-                <div class="course-indicator core"></div>
-                <div>
-                    <div>Data Structures and Algorithms - CMS250</div>
-                    <small>(CMS121 pre-req)</small>
-                </div>
-            </div>
-            <div class="course-card" draggable="true" data-course-id="CMS327">
-                <div class="course-indicator elective"></div>
-                <div>
-                    <div>Databases - CMS327</div>
-                    <small>(CMS230 pre-req)</small>
-                </div>
-            </div>
-            <div class="course-card" draggable="true" data-course-id="CMS270">
-                <div class="course-indicator core"></div>
-                <div>
-                    <div>Object Oriented Programming - CMS270</div>
-                    <small>(CMS250 recommended)</small>
-                </div>
-            </div>
-            <div class="course-card" draggable="true" data-course-id="CMS230">
-                <div class="course-indicator core"></div>
-                <div>
-                    <div>Computer Architecture and Systems - CMS230</div>
-                    <small>(CMS121 pre-req)</small>
-                </div>
-            </div>
-            <div class="course-card" draggable="true" data-course-id="MAT140">
-                <div class="course-indicator core"></div>
-                <div>
-                    <div>Discrete Math - MAT140</div>
-                    <small>(no pre-req)</small>
-                </div>
-            </div>
-        </div>
-        
-        <template id="course-template">
-            <div class="course-content">
-              <span class="course-name"></span>
-              <span class="probability-text"></span>
-            </div>
-            <button class="remove-course">&times;</button>
-        </template>
 
-        <div class="legend">
-            <div class="legend-item">
-                <div class="course-indicator elective"></div>
-                <span>Elective</span>
+            <!-- Course Card Template -->
+            <template id="course-template">
+                <div class="course-content">
+                    <div class="course-header">
+                        <span class="course-name"></span>
+                        <span class="probability-badge"></span>
+                    </div>
+                    <div class="course-details">
+                        <p class="crn"></p>
+                        <p class="professor"></p>
+                        <p class="time"></p>
+                        <p class="days"></p>
+                        <p class="credits"></p>
+                        <div class="prerequisites-list"></div>
+                    </div>
+                    <button class="remove-course" aria-label="Remove course">×</button>
+                </div>
+            </template>
+
+        </section>
+
+        <section class="course-planning">
+            <h3>Drag Courses to Plan Your Schedule</h3>
+            <div class="drag-area" id="dropZone" aria-label="Drop zone for selected courses">
+                <!-- Dragged courses will appear here -->
             </div>
-            <div class="legend-item">
-                <div class="course-indicator core"></div>
-                <span>Core Class</span>
+
+            <button class="button primary" id="generatePlan">Generate Plan</button>
+            <!-- Probability Legend -->
+            <div class="probability-legend">
+                <div class="legend-item">
+                    <div class="probability-indicator high"></div>
+                    <span>High Probability (>75%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="probability-indicator medium"></div>
+                    <span>Medium Probability (50-75%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="probability-indicator low"></div>
+                    <span>Low Probability (<50%)</span>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <h3>Drag and drop course to see enrollment probability:</h3>
-        <div class="drag-area" id="dropZone">
-            <!-- Dragged courses will appear here -->
-        </div>
-
-        <button class="button" id="generatePlan">Generate Plan</button>
-
-        <div class="semester-plan">
+        <section class="semester-plan">
             <h2 class="plan-header">Next Semester Plan</h2>
             <table class="courses-table">
                 <thead>
@@ -108,10 +91,13 @@
                 </tbody>
             </table>
 
-            <button class="button" id="copyPlan">Copy</button>
-            <button class="button secondary" id="downloadPlan">Download</button>
-            <button id="clearPlan" class="control-button">Clear Plan</button>
-        </div>
+            <div class="plan-actions">
+                <button class="button primary" id="copyPlan">Copy Plan</button>
+                <button class="button secondary" id="downloadPlan">Download Plan</button>
+                <button class="button danger" id="clearPlan">Clear Plan</button>
+            </div>
+            
+        </section>
     </div>
 
     <!-- Profile View -->
@@ -119,23 +105,54 @@
         <h2>My Profile</h2>
         
         <form class="profile-form">
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="rNumber">R-Number</label>
-                    <input type="text" id="rNumber" class="form-control">
+            <div class="form-section personal-info">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" class="form-control" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="classYear">Class Year</label>
-                    <input type="text" id="classYear" class="form-control">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="rNumber">R-Number</label>
+                        <input type="text" id="rNumber" class="form-control" required 
+                               pattern="R\d{8}" title="Please enter a valid R-Number (e.g., R12345678)">
+                    </div>
+                    <div class="form-group">
+                        <label for="classYear">Class Year</label>
+                        <select id="classYear" class="form-control" required>
+                            <option value="">Select Year</option>
+                            <option value="Freshman">Freshman</option>
+                            <option value="Sophomore">Sophomore</option>
+                            <option value="Junior">Junior</option>
+                            <option value="Senior">Senior</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="currentSemester">Current Semester</label>
+                        <select id="currentSemester" class="form-control" required>
+                            <option value="">Select Semester</option>
+                            <option value="Fall 2024">Fall 2024</option>
+                            <option value="Spring 2025">Spring 2025</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-row">
+            <div class="form-section programs-courses">
                 <div class="form-group">
-                    <label>Special Program</label>
+                    <label>Special Programs</label>
                     <div class="dropdown-container">
                         <button type="button" class="dropdown-toggle" id="specialProgramDropdown">
+                            Special Programs
                             <span class="dropdown-arrow">▼</span>
                         </button>
                         <div class="dropdown-menu" id="specialProgramMenu">
@@ -144,57 +161,58 @@
                                 <label for="amp">3/2 AMP Program</label>
                             </div>
                             <div class="dropdown-item">
-                                <input type="checkbox" id="athlete">
-                                <label for="athlete">Student Athlete</label>
-                            </div>
-                            <div class="dropdown-item">
                                 <input type="checkbox" id="honors">
                                 <label for="honors">Honors Student</label>
+                            </div>
+                            <div class="dropdown-item">
+                                <input type="checkbox" id="athlete">
+                                <label for="athlete">Student Athlete</label>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="form-group">
-                    <label>Select Classes Already Taken</label>
+                    <label>Completed Courses</label>
                     <div class="dropdown-container">
                         <button type="button" class="dropdown-toggle" id="classesDropdown">
-                            <span class="dropdown-icon">📚</span>
+                            Select Completed Courses
                             <span class="dropdown-arrow">▼</span>
                         </button>
                         <div class="dropdown-menu" id="classesMenu">
                             <div class="dropdown-item">
-                                <input type="checkbox" id="cms120">
-                                <label for="cms120">Intro to Computer Science - CMS120</label>
+                                <input type="checkbox" id="intro_cs">
+                                <label for="intro_cs">Intro to Computer Science</label>
                             </div>
                             <div class="dropdown-item">
-                                <input type="checkbox" id="cms327">
-                                <label for="cms327">Databases - CMS327</label>
+                                <input type="checkbox" id="intro_cs_lab">
+                                <label for="intro_cs_lab">Intro to Computer Sci Lab</label>
                             </div>
                             <div class="dropdown-item">
-                                <input type="checkbox" id="cms430">
-                                <label for="cms430">Artificial Intelligence - CMS430</label>
+                                <input type="checkbox" id="prog_software">
+                                <label for="prog_software">Prog & Software Development</label>
                             </div>
                             <div class="dropdown-item">
-                                <input type="checkbox" id="cms250">
-                                <label for="cms250">Data Structures and Algor - CMS250</label>
+                                <input type="checkbox" id="data_structures">
+                                <label for="data_structures">Data Structures and Algorithms</label>
                             </div>
                             <div class="dropdown-item">
-                                <input type="checkbox" id="mat140">
-                                <label for="mat140">Discrete Mathematics - MAT140</label>
+                                <input type="checkbox" id="computer_org">
+                                <label for="computer_org">Computer Org & Architecture</label>
+                            </div>
+                            <div class="dropdown-item">
+                                <input type="checkbox" id="oop">
+                                <label for="oop">Object-Oriented Design & Development</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="currentSemester">Current Semester</label>
-                    <input type="text" id="currentSemester" class="form-control">
-                </div>
+            <div class="form-actions">
+                <button type="submit" class="button primary">Save Profile</button>
+                <button type="reset" class="button secondary">Reset</button>
             </div>
-
-            <button type="submit" class="button finish-button">Finish</button>
         </form>
     </div>
 
