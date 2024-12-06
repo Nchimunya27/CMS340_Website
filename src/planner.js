@@ -204,39 +204,60 @@ function calculateProbability(person, course) {
     let statusStat = 0;
     let courseCapStat = 0;
 
-    // Class year probability
-    switch(person.classYear) {
-        case 'Senior': classYearStat = 50; break;
-        case 'Junior': classYearStat = 40; break;
-        case 'Sophomore': classYearStat = 30; break;
-        case 'Freshman': classYearStat = 20; break;
-        default: classYearStat = 20;
+    // Calculate class year probability
+    if (person.year === 'Senior') {
+        classYearStat = 50;
+    } else if (person.year === 'Junior') {
+        classYearStat = 40;
+    } else if (person.year === 'Sophomore') {
+        classYearStat = 30;
+    } else if (person.year === 'Freshman') {
+        classYearStat = 20;
     }
 
-    // Special programs bonus
-    if (person.specialPrograms.some(program => 
-        ['Honors Student', '3/2 AMP Program', 'Student Athlete'].includes(program))) {
+    // Calculate status probability (Honors/3-2/Athlete)
+    if (person.status === 'Honors' || person.status === '3/2' || person.status === 'Athlete') {
         statusStat = 20;
     }
 
-
-    // Capacity scaling
-    if (course.capacity <= 18) {
-        courseCapStat = person.classYear === 'Senior' ? 10 :
-                       person.classYear === 'Junior' ? 8 :
-                       person.classYear === 'Sophomore' ? 6 : 4;
-    } else if ((course.capacity > 18) && (course.capacity < 30)) {
-        courseCapStat = person.classYear === 'Senior' ? 15 :
-                       person.classYear === 'Junior' ? 12 :
-                       person.classYear === 'Sophomore' ? 9 : 6;
+    // Calculate capacity probability
+    if (course.classSize < 18) {
+        if (person.year === 'Senior') {
+            courseCapStat = 10;
+        } else if (person.year === 'Junior') {
+            courseCapStat = 8;
+        } else if (person.year === 'Sophomore') {
+            courseCapStat = 6;
+        } else if (person.year === 'Freshman') {
+            courseCapStat = 4;
+        }
+    } else if (course.classSize < 30) {
+        if (person.year === 'Senior') {
+            courseCapStat = 15;
+        } else if (person.year === 'Junior') {
+            courseCapStat = 12;
+        } else if (person.year === 'Sophomore') {
+            courseCapStat = 9;
+        } else if (person.year === 'Freshman') {
+            courseCapStat = 6;
+        }
     } else {
-        courseCapStat = person.classYear === 'Senior' ? 20 :
-                       person.classYear === 'Junior' ? 15 :
-                       person.classYear === 'Sophomore' ? 12 : 8;
+        if (person.year === 'Senior') {
+            courseCapStat = 20;
+        } else if (person.year === 'Junior') {
+            courseCapStat = 15;
+        } else if (person.year === 'Sophomore') {
+            courseCapStat = 12;
+        } else if (person.year === 'Freshman') {
+            courseCapStat = 8;
+        }
     }
 
+    // Calculate total probability
     const totalProbability = classYearStat + statusStat + courseCapStat;
-    return Math.max(0, Math.min(totalProbability, 100));
+    
+    // Ensure probability doesn't exceed 100%
+    return Math.min(totalProbability, 100);
 }
 
 // Semester Plan Functions
@@ -566,199 +587,47 @@ function loadProfileData() {
     }
 }
 
-// Course Data Creation
+const BASE_URL = "https://305d-2603-9001-2af0-4c60-5d41-1cf-df83-2a86.ngrok-free.app";
+
+
+// Fetches from Database
 function createCourseData() {
-    const coursesData = [
-        {
-            capacity: 30,
-            courseID: 13903,
-            credit: 4,
-            days: "MWF",
-            professor: "D Myers",
-            time: "10:00-10:50A",
-            title: "Intro to Computer Science"
-        },
-        {
-            capacity: 30,
-            courseID: 13904,
-            credit: 2,
-            days: "W",
-            professor: "D Myers",
-            time: "2:00-5:00P",
-            title: "Intro to Computer Sci Lab"
-          },
-          {
-            capacity: 22,
-            courseID: 13905,
-            credit: 4,
-            days: "TR",
-            professor: "S Tisha",
-            time: "11:00-12:15P",
-            title: "Prog & Software Development"
-          },
-          {
-            capacity: 22,
-            courseID: 13906,
-            credit: 4,
-            days: "TR",
-            professor: "R Elva",
-            time: "11:00-12:15P",
-            title: "Object-Oriented Design & Devel"
-          },
-          {
-            capacity: 22,
-            courseID: 13907,
-            credit: 4,
-            days: "TR",
-            professor: "R Elva",
-            time: "3:30-4:45P",
-            title: "Computer Science Capstone"
-          },
-          {
-            capacity: 22,
-            courseID: 14451,
-            credit: 4,
-            days: "TR",
-            professor: "S Tisha",
-            time: "2:00-3:15P",
-            title: "Data Structures and Algorithms"
-          },
-          {
-            capacity: 22,
-            courseID: 14869,
-            credit: 4,
-            days: "MW",
-            professor: "V Summet",
-            time: "1:00-2:15P",
-            title: "Computer Org & Architecture"
-          },
-          {
-            capacity: 15,
-            courseID: 14870,
-            credit: 4,
-            days: "MWF",
-            professor: "D Myers",
-            time: "11:00-11:50A",
-            title: "Simulation/Stochastic Modeling"
-          },
-          {
-            capacity: 22,
-            courseID: 14872,
-            credit: 4,
-            days: "MW",
-            professor: "V Summet",
-            time: "2:30-3:45P",
-            title: "Operating Systems"
-          },
-          {
-            capacity: 22,
-            courseID: 15064,
-            credit: 2,
-            days: "MWF",
-            professor: "D Myers",
-            time: "12:00-12:50P",
-            title: "Topics: Programming with AI"
-          },
-          {
-            capacity: 22,
-            courseID: 15086,
-            credit: 4,
-            days: "TR",
-            professor: "R Elva",
-            time: "2:00-3:15P",
-            title: "Software Modeling"
-          },
-          {
-            capacity: 22,
-            courseID: 15132,
-            credit: 4,
-            days: "MWF",
-            professor: "V Summet",
-            time: "12:00-12:50P",
-            title: "Human-Computer Interaction"
-          }
-    ];
-
-    const prerequisitesData = [
-        {
-            prereqCourseID: 13904,
-            prereqCourseName: "Intro to Computer Sci Lab",
-            prereqID: 1,
-            requiredBy: 13903
-        },
-        {
-            "prereqCourseID": 13903,
-            "prereqCourseName": "Intro to Computer Science",
-            "prereqID": 2,
-            "requiredBy": 13904
-          },
-          {
-            "prereqCourseID": 13903,
-            "prereqCourseName": "Intro to Computer Science",
-            "prereqID": 3,
-            "requiredBy": 13905
-          },
-          {
-            "prereqCourseID": 13904,
-            "prereqCourseName": "Intro to Computer Sci Lab",
-            "prereqID": 4,
-            "requiredBy": 13905
-          },
-          {
-            "prereqCourseID": 13903,
-            "prereqCourseName": "Intro to Computer Science",
-            "prereqID": 5,
-            "requiredBy": 15064
-          },
-          {
-            "prereqCourseID": 13905,
-            "prereqCourseName": "Prog & Software Development",
-            "prereqID": 6,
-            "requiredBy": 14869
-          },
-          {
-            "prereqCourseID": 13905,
-            "prereqCourseName": "Prog & Software Development",
-            "prereqID": 7,
-            "requiredBy": 14451
-          },
-          {
-            "prereqCourseID": 13905,
-            "prereqCourseName": "Prog & Software Development",
-            "prereqID": 8,
-            "requiredBy": 13906
-          },
-          {
-            "prereqCourseID": 13905,
-            "prereqCourseName": "Prog & Software Development",
-            "prereqID": 9,
-            "requiredBy": 15132
-          },
-          {
-            "prereqCourseID": 13905,
-            "prereqCourseName": "Prog & Software Development",
-            "prereqID": 10,
-            "requiredBy": 14870
-          },
-          {
-            "prereqCourseID": 13906,
-            "prereqCourseName": "Object-Oriented Design & Devel",
-            "prereqID": 11,
-            "requiredBy": 15086
-          },
-          {
-            "prereqCourseID": 14869,
-            "prereqCourseName": "Computer Org & Architecture",
-            "prereqID": 12,
-            "requiredBy": 14872
-          },
-          {
-            "prereqCourseID": 14451,
-            "prereqCourseName": "Data Structures and Algorithms",
-            "prereqID": 13,
-            "requiredBy": 14872
-          }
-    ];
-
-    return createCourseObjects(coursesData, prerequisitesData);
+    return fetch(`${BASE_URL}/courses`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch courses data');
+            }
+            return response.json();
+        })
+        .then(coursesData => {
+            return fetch(`${BASE_URL}/prereqs`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch prerequisites data');
+                    }
+                    return response.json();
+                })
+                .then(prerequisitesData => {
+                    if (Array.isArray(coursesData) && Array.isArray(prerequisitesData)) {
+                        return createCourseObjects(coursesData, prerequisitesData);
+                    }
+                    throw new Error('Invalid data format');
+                });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            return [];
+        });
 }
+
+
+
+// Function to process course and prerequisites data (assuming this function exists)
+function createCourseObjects(coursesData, prerequisitesData) {
+    // You can process the data or simply return it, depending on your needs
+    return {
+        courses: coursesData,
+        prerequisites: prerequisitesData
+    };
+}
+
